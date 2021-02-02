@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { Link } from 'react-router-dom';
 import firebase from '../../firebase';
+import md5 from 'md5';
 
 function RegisterPage() {
 
@@ -23,10 +24,17 @@ function RegisterPage() {
 
     try {
       setLoading(true);
+      // firebase에서 이메일과 비밀번호로 유저 생성
       let createdUser = await firebase
         .auth()
         .createUserWithEmailAndPassword(data.email, data.password);
-        // console.log("createdUser", createdUser);
+      
+      // firebase에서 생성한 유저에 추가 정보 입력
+      await createdUser.user
+        .updateProfile({
+          displayName: data.name,
+          photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+        })
         setLoading(false);
     } catch (error) {
         setErrorFromSubmit(error.message);
