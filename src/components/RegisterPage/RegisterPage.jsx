@@ -7,25 +7,30 @@ function RegisterPage() {
 
   const { register, watch, errors, handleSubmit } = useForm({ mode: "onChange" });
   const [ errorFromSubmit, setErrorFromSubmit ] = useState("");
+  const [ loading, setLoading ] = useState(false);
+
   const password = useRef();
   password.current = watch("password");
 
   const onSubmit = async (data) => {
 
     // data = {
-    //   email: "sroovy@naver.com"
+    //   email: "test@test.com"
     //   name: "이수연"
-    //   password: "dltndus1"
-    //   password_confirm: "dltndus1"
+    //   password: "123456"
+    //   password_confirm: "123456"
     // }
 
     try {
+      setLoading(true);
       let createdUser = await firebase
         .auth()
         .createUserWithEmailAndPassword(data.email, data.password);
-        console.log("createdUser", createdUser);
+        // console.log("createdUser", createdUser);
+        setLoading(false);
     } catch (error) {
         setErrorFromSubmit(error.message);
+        setLoading(false);
       setTimeout(() => {
         setErrorFromSubmit("");
       }, 5000)
@@ -86,7 +91,7 @@ function RegisterPage() {
             <p>{errorFromSubmit}</p>
           }
 
-        <button type="submit">SUBMIT</button>
+        <button type="submit" disabled={loading}>SUBMIT</button>
       </form>
       <div className="link">
         <Link className="login_link" to="/">홈화면</Link>
