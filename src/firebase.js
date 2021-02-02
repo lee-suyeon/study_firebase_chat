@@ -17,3 +17,5 @@ import "firebase/storage";
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   // firebase.analytics(); 구글애널리틱스
+
+  export default firebase;

@@ -1,19 +1,43 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { Link } from 'react-router-dom';
+import firebase from '../../firebase';
 
 function RegisterPage() {
 
-  const { register, watch, errors } = useForm({ mode: "onChange" });
+  const { register, watch, errors, handleSubmit } = useForm({ mode: "onChange" });
+  const [ errorFromSubmit, setErrorFromSubmit ] = useState("");
   const password = useRef();
   password.current = watch("password");
+
+  const onSubmit = async (data) => {
+
+    // data = {
+    //   email: "sroovy@naver.com"
+    //   name: "이수연"
+    //   password: "dltndus1"
+    //   password_confirm: "dltndus1"
+    // }
+
+    try {
+      let createdUser = await firebase
+        .auth()
+        .createUserWithEmailAndPassword(data.email, data.password);
+        console.log("createdUser", createdUser);
+    } catch (error) {
+        setErrorFromSubmit(error.message);
+      setTimeout(() => {
+        setErrorFromSubmit("");
+      }, 5000)
+    }
+  }
 
   return (
     <div className="auth-wrapper">
       <div className="register-title">
         <h3>Register</h3>
       </div>
-      <form onSubmit>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <label>E-mail</label>
         <input 
           name="email" 
@@ -57,6 +81,10 @@ function RegisterPage() {
           && <p>패스워드를 입력해주세요.</p>}  {/* This password field is required */}
         {errors.password_confirm && errors.password_confirm.type === "validate"
           && <p>패스워드가 같지 않습니다. </p>}  {/* The password don't match */}
+
+          {errorFromSubmit && 
+            <p>{errorFromSubmit}</p>
+          }
 
         <button type="submit">SUBMIT</button>
       </form>
