@@ -6,6 +6,8 @@ import {
   Link,
   useHistory,
 } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from './redux/actions/user_action';
 
 import ChatPage from './components/ChatPage/ChatPage'
 import LoginPage from './components/LoginPage/LoginPage'
@@ -15,6 +17,7 @@ import firebase from './firebase';
 
 function App(props) {
   let history = useHistory();
+  let dispatch = useDispatch();
   
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
@@ -22,6 +25,7 @@ function App(props) {
       // 로그인이 된 상태
       if(user){
         history.push("/");
+        dispatch(setUser(user))
       } else { // 로그인이 안 된 상태
         history.push("/login");
       }
