@@ -18,6 +18,7 @@ import firebase from './firebase';
 function App(props) {
   let history = useHistory();
   let dispatch = useDispatch();
+  const isLoading = useSelector(state => state.user.isLoading);
   
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
@@ -32,13 +33,17 @@ function App(props) {
     });
   }, [])
 
-  return (
-    <Switch>
-      <Route exact path="/" component={ChatPage} />
-      <Route exact path="/login" component={LoginPage} />
-      <Route exact path="/register" component={RegisterPage} />
-    </Switch>
-  );
+  if(isLoading){
+    return <div>...loading</div>
+  } else {
+    return (
+      <Switch>
+        <Route exact path="/" component={ChatPage} />
+        <Route exact path="/login" component={LoginPage} />
+        <Route exact path="/register" component={RegisterPage} />
+      </Switch>
+    );
+  }
 }
 
 export default App;
