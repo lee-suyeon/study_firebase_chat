@@ -9,7 +9,7 @@ import DirectMessages from './DirectMessages';
 const SideWrapper = styled.div`
   min-height: 100vh;
   min-width: 275px;
-  background-color: #a1cae2;
+  background-color: #9dad7f;
   color: white;
   padding: 2rem;
 `
