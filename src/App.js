@@ -7,7 +7,7 @@ import {
   useHistory,
 } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from './redux/actions/user_action';
+import { setUser, clearUser } from './redux/actions/user_action';
 
 import ChatPage from './components/ChatPage/ChatPage'
 import LoginPage from './components/LoginPage/LoginPage'
@@ -26,9 +26,10 @@ function App(props) {
       // 로그인이 된 상태
       if(user){
         history.push("/");
-        dispatch(setUser(user))
+        dispatch(setUser(user));
       } else { // 로그인이 안 된 상태
         history.push("/login");
+        dispatch(clearUser());
       }
     });
   }, [])

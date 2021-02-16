@@ -1,5 +1,6 @@
 import { 
   SET_USER,
+  CLEAR_USER,
 } from '../actions/user_action';
 
 const initialUserState = {
@@ -13,6 +14,12 @@ const user = (state = initialUserState, action) => {
     return {
       ...state,
       currentUser: action.payload,
+      isLoading: false,
+    }
+    case CLEAR_USER:
+    return {
+      ...state,
+      currentUser: null,
       isLoading: false,
     }
     default:

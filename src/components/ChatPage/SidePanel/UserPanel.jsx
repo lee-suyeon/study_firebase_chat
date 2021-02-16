@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components'
+import firebase from '../../../firebase';
 
 import { FiCoffee } from 'react-icons/fi';
 import { Dropdown, Image } from 'react-bootstrap';
@@ -49,6 +50,10 @@ const ProfileWrapper = styled.div`
 function UserPanel() {
   const user = useSelector(state => state.user.currentUser);
 
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  }
+
   return (
     <div>
       {/* Logo */}
@@ -61,14 +66,14 @@ function UserPanel() {
         <Image src={user && user.photoURL} roundedCircle />
         <Dropdown>
           <Dropdown.Toggle id="dropdown-basic">
-            {user.displayName}
+            {user && user.displayName}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
             <Dropdown.Item>
               프로필 사진 변경
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item onClick={handleLogout}>
               로그아웃
             </Dropdown.Item>
           </Dropdown.Menu>
