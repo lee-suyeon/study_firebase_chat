@@ -1,5 +1,6 @@
 export const SET_USER = "SET_USER";
 export const CLEAR_USER = "CLEAR_USER";
+export const SET_PHOTO_URL = "SET_PHOTO_URL"
 
 export const setUser = (user) => {
   return {
@@ -13,3 +14,10 @@ export const clearUser = () => {
     type: CLEAR_USER,
   };
 };
+
+export const setPhotoURL = photoURL => {
+  return {
+    type: SET_PHOTO_URL,
+    payload: photoURL,
+  };
+}

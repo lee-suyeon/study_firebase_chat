@@ -1,6 +1,7 @@
 import { 
   SET_USER,
   CLEAR_USER,
+  SET_PHOTO_URL,
 } from '../actions/user_action';
 
 const initialUserState = {
@@ -20,6 +21,12 @@ const user = (state = initialUserState, action) => {
     return {
       ...state,
       currentUser: null,
+      isLoading: false,
+    }
+    case SET_PHOTO_URL:
+    return {
+      ...state,
+      currentUser: { ...state.currentUser, photoURL: action.payload },
       isLoading: false,
     }
     default:
