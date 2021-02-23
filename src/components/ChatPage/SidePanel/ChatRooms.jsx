@@ -32,6 +32,10 @@ class ChatRooms extends Component {
     this.AddChatRoomsListeners();
   }
 
+  componentWillUnmount() {
+    this.state.chatRoomsRef.off();
+  }
+
   setFirstChatRoom = () => {
     const { chatRooms, firstLoad } = this.state;
 
@@ -93,8 +97,6 @@ class ChatRooms extends Component {
     } catch (errer) {
       alert("error");
     }
-
-
   }
 
   isFormValid = (name, description) => name && description;
