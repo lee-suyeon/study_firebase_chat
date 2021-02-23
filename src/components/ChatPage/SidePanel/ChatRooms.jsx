@@ -7,6 +7,8 @@ import { FiPackage, FiPlus } from 'react-icons/fi'
 import { connect } from 'react-redux'
 import firebase from '../../../firebase'
 
+import { setCurrentChatRoom } from '../../../redux/actions/chatRoom_action'
+
 const ChatRoomList = styled.ul`
   list-style-type: none;
   padding: 0;
@@ -21,11 +23,24 @@ class ChatRooms extends Component {
       description: "",
       chatRoomsRef: firebase.database().ref("chatRooms"),
       chatRooms: [],
+      firstLoad: true,
+      activeChatRoomId: "",
     }
   }
 
   componentDidMount() {
     this.AddChatRoomsListeners();
+  }
+
+  setFirstChatRoom = () => {
+    const { chatRooms, firstLoad } = this.state;
+
+    const firstChatRoom = chatRooms[0];
+    if(firstLoad && chatRooms.length > 0) {
+      this.props.dispatch(setCurrentChatRoom(firstChatRoom));
+      this.setState({ activeChatRoomId: firstChatRoom.id })
+    }
+    this.setState({ firstLoad: false });
   }
 
   AddChatRoomsListeners = () => {
@@ -34,7 +49,8 @@ class ChatRooms extends Component {
     this.state.chatRoomsRef.on("child_added", DataSnapshot => {
       chatRoomArray.push(DataSnapshot.val());
 
-      this.setState({ chatRooms: chatRoomArray })
+      this.setState({ chatRooms: chatRoomArray }, 
+        () => this.setFirstChatRoom());
     })
   }
 
@@ -83,8 +99,13 @@ class ChatRooms extends Component {
 
   isFormValid = (name, description) => name && description;
 
+  changeChatRoom = (room) => {
+    this.props.dispatch(setCurrentChatRoom(room));
+    this.setState({ activeChatRoomId: room.id });
+  }
+
   render () {
-    const { show, name, description, chatRooms } = this.state;
+    const { show, name, description, chatRooms, activeChatRoomId } = this.state;
 
     return (
       <div>
@@ -102,8 +123,18 @@ class ChatRooms extends Component {
         {/* ChatRoom list */}
         <ChatRoomList>
           {chatRooms.length > 0 && chatRooms.map(room => {
-            return <li key={room.id}> # {room.name} </li>
-          })}
+            return (
+              <li 
+                key={room.id}
+                style={{
+                  padding: "0 0.5rem",
+                  background: room.id === activeChatRoomId && "#c0cca9"}}
+                onClick={() => this.changeChatRoom(room)}
+              > 
+                # {room.name}
+              </li>
+            )})
+          }
         </ChatRoomList>
 
         {/* Add chat rooms */}
