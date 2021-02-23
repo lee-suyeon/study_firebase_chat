@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
+import styled from 'styled-components'
 
 import { Modal, Button, Form } from 'react-bootstrap'
 import { FiPackage, FiPlus } from 'react-icons/fi'
 
 import { connect } from 'react-redux'
 import firebase from '../../../firebase'
+
+const ChatRoomList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+`
 
 class ChatRooms extends Component {
   constructor(props) {
@@ -13,9 +19,25 @@ class ChatRooms extends Component {
       show: false,
       name: "",
       description: "",
-      chatRoomsRef: firebase.database().ref("chatRooms")
+      chatRoomsRef: firebase.database().ref("chatRooms"),
+      chatRooms: [],
     }
   }
+
+  componentDidMount() {
+    this.AddChatRoomsListeners();
+  }
+
+  AddChatRoomsListeners = () => {
+    let chatRoomArray = [];
+
+    this.state.chatRoomsRef.on("child_added", DataSnapshot => {
+      chatRoomArray.push(DataSnapshot.val());
+
+      this.setState({ chatRooms: chatRoomArray })
+    })
+  }
+
 
   handleClose = () => this.setState({ show: false });
   handleShow = () => this.setState({ show: true });
@@ -62,7 +84,7 @@ class ChatRooms extends Component {
   isFormValid = (name, description) => name && description;
 
   render () {
-    const { show, name, description } = this.state;
+    const { show, name, description, chatRooms } = this.state;
 
     return (
       <div>
@@ -76,6 +98,13 @@ class ChatRooms extends Component {
             style={{ position: 'absolute', right: 0, cursor: 'pointer' }}
           />
         </div>
+
+        {/* ChatRoom list */}
+        <ChatRoomList>
+          {chatRooms.length > 0 && chatRooms.map(room => {
+            return <li key={room.id}> # {room.name} </li>
+          })}
+        </ChatRoomList>
 
         {/* Add chat rooms */}
         <Modal show={show} onHide={this.handleClose}>
