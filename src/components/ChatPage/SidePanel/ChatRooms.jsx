@@ -14,6 +14,23 @@ const ChatRoomList = styled.ul`
   padding: 0;
 `
 
+const ChatRoomTitle = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  .package-icon {
+    margin-right: 3px;
+  }
+
+  .plus-icon {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+  }
+`
+
 class ChatRooms extends Component {
   constructor(props) {
     super(props);
@@ -110,17 +127,15 @@ class ChatRooms extends Component {
     const { show, name, description, chatRooms, activeChatRoomId } = this.state;
 
     return (
-      <div>
-        <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center'}}>
-          
-          <FiPackage style={{ marginRight: 3 }} />
+      <div className="chat-rooms">
+        <ChatRoomTitle>
+          <FiPackage className="package-icon"/>
           CHAT ROOMS{" "} (1)
-
           <FiPlus
+            className="plus-icon"
             onClick={this.handleShow}
-            style={{ position: 'absolute', right: 0, cursor: 'pointer' }}
           />
-        </div>
+        </ChatRoomTitle>
 
         {/* ChatRoom list */}
         <ChatRoomList>
