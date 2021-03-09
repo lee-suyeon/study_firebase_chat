@@ -24,16 +24,19 @@ function Message({ message, user }) {
   }
 
   const isMessageMine = (message, user) => {
-    return message.user.id === user.id
+    return message.user.id === user.uid
   }
 
   return (
-    <Media style={{ marginBottom: '3px' }}>
+    <Media style={{ marginBottom: '0.5rem' }}>
       <MessageImage
         src={message.user.image}
         alt={message.user.name}
       />
-      <Media.Body style={{ backgroundColor: isMessageMine(message, user) && "#ececec" }}>
+      <Media.Body 
+        style={{ 
+          backgroundColor: isMessageMine(message, user) && "#ececec",
+          }}>
         <h6>{message.user.name}{" "}
           <Timestamp>
             {timeFromNow(message.timestamp)}

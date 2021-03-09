@@ -7,6 +7,7 @@ import firebase from '../../../firebase';
 import Message from './Message';
 import MessageHeader from './MessageHeader';
 import MessageForm from './MessageForm';
+import { FiMessageSquare } from 'react-icons/fi';
 
 
 const MainWrapper = styled.div`
@@ -49,7 +50,6 @@ export class MainPanel extends Component {
         messages: messagesArray,
         messagesLoading: false
       });
-      
     })
   }
 
@@ -67,16 +67,21 @@ export class MainPanel extends Component {
   }
 
   render () {
-
+    const { user } = this.props;
     const { messages } = this.state;
-
     return (
       <MainWrapper>
         <MessageHeader />
         <MessageWrapper>
-          <Message>
-            {this.renderMessages(messages)}
-          </Message>
+          {messages.length > 0 && 
+            messages.map((message) => (
+              <Message
+                key={message.timestamp}
+                message={message}
+                user={user}
+              />
+            ))
+          }
         </MessageWrapper>
           <MessageForm />
       </MainWrapper>

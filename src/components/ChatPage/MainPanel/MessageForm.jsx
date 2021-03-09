@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
-import firebase from '../../../firebase';
+import firebase from '../../../firebase'
 
 import { Form, ProgressBar, Row, Col } from 'react-bootstrap'
+
+import mime from 'mime-types'
 
 const StyledButton = styled.button`
   background: #7ebeb6;
@@ -30,6 +32,8 @@ function MessageForm() {
   const [ errors, setErrors ] = useState([]);
   const [ loading, setLoading ] = useState(false);
   const messagesRef = firebase.database().ref("messages");
+  const inputOpenImageRef = useRef();
+  const storageRef = firebase.storage().ref();
 
   const handleChange = e => {
     setContent(e.target.value)
@@ -50,12 +54,10 @@ function MessageForm() {
     } else {
       message.content = content;
     }
-
     return message;
   }
 
   const handleSubmit = async () => {
-
     if(!content){
       setErrors(prev => prev.concat("Type contents first"))
       return;
@@ -79,7 +81,23 @@ function MessageForm() {
         setErrors([])
       }, 500)
     }
+  }
 
+  const handleOpenImageRef = () => {
+    inputOpenImageRef.current.click();
+  }
+
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+
+    const filePath = `/message/public/${file.name}`;
+    const metadata = { contentType: mime.lookup(file.name) }
+    
+    try {
+      await storageRef.child(filePath).put(file, metadata);
+    } catch {
+      alert("err");
+    }
   }
 
   return (
@@ -111,9 +129,19 @@ function MessageForm() {
           <StyledButton onClick={handleSubmit}>SEND</StyledButton>
         </Col>
         <Col>
-          <StyledButton>UPLOAD</StyledButton>
+          <StyledButton onClick={handleOpenImageRef}>
+            UPLOAD
+          </StyledButton>
         </Col>
       </Row>
+      
+      {/* file upload input */}
+      <input 
+        type="file"
+        style={{ display: "none" }}
+        ref={inputOpenImageRef}
+        onChange={handleUploadImage}
+      />
     </div>
   )
 }
