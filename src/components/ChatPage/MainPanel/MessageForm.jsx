@@ -93,19 +93,35 @@ function MessageForm() {
 
     const filePath = `/message/public/${file.name}`;
     const metadata = { contentType: mime.lookup(file.name) }
-    
+    setLoading(true)
     try {
 
       // 파일을 스토리지에 저장
       let uploadTask = storageRef.child(filePath).put(file, metadata);
     
       // 파일 저장되는 퍼센티지 구하기
-      uploadTask.on("state_changed", UploadTaskSnapshot => {
-        const percentage = Math.round(
-          (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
-        )
-        setPersentage(percentage)
-      })
+      uploadTask.on("state_changed", 
+        UploadTaskSnapshot => {
+          const percentage = Math.round(
+            (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
+          )
+          setPersentage(percentage)
+        },
+        err => {
+          console.error(err)
+          setLoading(false)
+        },
+        () => {
+          // 저장이 다 된 후에 파일 메세지 전송 (데이터 베이스에 저장)
+          // 저장된 파일을 다운로드 받을 수 있는 URL 가져오기
+          uploadTask.snapshot.ref.getDownloadURL()
+          .then(downloadURL => {
+            console.log("downloadURL", downloadURL)
+            messagesRef.child(chatRoom.id).push().set(createMessage(downloadURL))
+            setLoading(false)
+          })
+        }
+      )
 
     } catch {
       alert("err"); 
@@ -141,10 +157,12 @@ function MessageForm() {
 
       <Row>
         <Col>
-          <StyledButton onClick={handleSubmit}>SEND</StyledButton>
+          <StyledButton onClick={handleSubmit} disabled={loading}>
+            SEND
+          </StyledButton>
         </Col>
         <Col>
-          <StyledButton onClick={handleOpenImageRef}>
+          <StyledButton onClick={handleOpenImageRef} disabled={loading}>
             UPLOAD
           </StyledButton>
         </Col>
@@ -153,6 +171,7 @@ function MessageForm() {
       {/* file upload input */}
       <input 
         type="file"
+        accept="image/jpeg, image/png"
         style={{ display: "none" }}
         ref={inputOpenImageRef}
         onChange={handleUploadImage}
