@@ -31,6 +31,7 @@ function MessageForm() {
   const [ content, setContent ] = useState("");
   const [ errors, setErrors ] = useState([]);
   const [ loading, setLoading ] = useState(false);
+  const [ percentage, setPersentage ] = useState(0);
   const messagesRef = firebase.database().ref("messages");
   const inputOpenImageRef = useRef();
   const storageRef = firebase.storage().ref();
@@ -87,16 +88,27 @@ function MessageForm() {
     inputOpenImageRef.current.click();
   }
 
-  const handleUploadImage = async (e) => {
+  const handleUploadImage = (e) => {
     const file = e.target.files[0];
 
     const filePath = `/message/public/${file.name}`;
     const metadata = { contentType: mime.lookup(file.name) }
     
     try {
-      await storageRef.child(filePath).put(file, metadata);
+
+      // 파일을 스토리지에 저장
+      let uploadTask = storageRef.child(filePath).put(file, metadata);
+    
+      // 파일 저장되는 퍼센티지 구하기
+      uploadTask.on("state_changed", UploadTaskSnapshot => {
+        const percentage = Math.round(
+          (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
+        )
+        setPersentage(percentage)
+      })
+
     } catch {
-      alert("err");
+      alert("err"); 
     }
   }
 
@@ -112,11 +124,14 @@ function MessageForm() {
         </Form.Group>
       </Form>
       
-      <ProgressBar 
-        variant="warning" 
-        label="60%"
-        now={60} 
-      /> 
+      {
+        !(percentage === 0 || percentage === 100) &&
+          <ProgressBar 
+            variant="warning" 
+            label={`${percentage}%`}
+            now={percentage} 
+          /> 
+      }
 
       <div>
         {errors.map((errorMsg, i) => 
