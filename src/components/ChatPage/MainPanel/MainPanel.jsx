@@ -7,8 +7,6 @@ import firebase from '../../../firebase';
 import Message from './Message';
 import MessageHeader from './MessageHeader';
 import MessageForm from './MessageForm';
-import { FiMessageSquare } from 'react-icons/fi';
-
 
 const MainWrapper = styled.div`
   padding: 2rem 2rem 0 2rem;
@@ -30,6 +28,9 @@ export class MainPanel extends Component {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
     messagesLoading: true,
+    searchTerm: "",
+    searchLoading: true,
+    searchResults: [],
   }
 
   componentDidMount() {
@@ -38,6 +39,29 @@ export class MainPanel extends Component {
     if(chatRoom) {
       this.addMessagesListeners(chatRoom.id)
     }
+  }
+
+  handleSearchMessages = () => {
+    const chatRoomMessages = [ ...this.state.messages ];
+    const regex = new RegExp(this.state.searchTerm, "gi");
+    const searchResults = chatRoomMessages.reduce((acc, message) => {
+      if(
+        message.content && message.content.match(regex) ||
+        (message.user.name.match(regex))
+      ){
+        acc.push(message)
+      }
+      return acc;
+    }, [])
+    this.setState({ searchResults })
+  }
+
+  handleSearchChange = (e) => {
+    this.setState({
+      searchTerm: e.target.value,
+      searchLoading: true
+    }, () => this.handleSearchMessages())
+    
   }
   
   addMessagesListeners = (chatRoomId) => {
@@ -53,34 +77,28 @@ export class MainPanel extends Component {
     })
   }
 
-  renderMessages = (messages) => {
-    const { user } = this.props;
-
+  renderMessages = (messages) => 
     messages.length > 0 &&
-    messages.map(message => (
-      <Message
-        key={message.timestamp}
-        message={message}
-        user={user}
-      />
-    ))
-  }
+    messages.map((message) => (
+        <Message
+          key={message.timestamp}
+          message={message}
+          user={this.props.user}
+        />
+  ))
+  
 
   render () {
-    const { user } = this.props;
-    const { messages } = this.state;
+    const { messages, searchTerm, searchResults } = this.state;
     return (
       <MainWrapper>
-        <MessageHeader />
+        <MessageHeader 
+          handleSearchChange={this.handleSearchChange}
+        />
         <MessageWrapper>
-          {messages.length > 0 && 
-            messages.map((message) => (
-              <Message
-                key={message.timestamp}
-                message={message}
-                user={user}
-              />
-            ))
+          {searchTerm ?
+            this.renderMessages(searchResults) :
+            this.renderMessages(messages)
           }
         </MessageWrapper>
           <MessageForm />

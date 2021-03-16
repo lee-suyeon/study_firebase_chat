@@ -29,7 +29,7 @@ const AvatarWrapper = styled.div`
 `
 
 
-function MessageHeader() {
+function MessageHeader({ handleSearchChange }) {
   return (
     <HeaderWrapper>
         <Container>
@@ -41,6 +41,7 @@ function MessageHeader() {
                 <InputGroup.Text id="basic-addon1"><FiSearch /></InputGroup.Text>
               </InputGroup.Prepend>
               <FormControl
+                onChange={handleSearchChange}
                 placeholder="Search Messages"
                 aria-label="Search"
                 aria-describedby="basic-addon1"
