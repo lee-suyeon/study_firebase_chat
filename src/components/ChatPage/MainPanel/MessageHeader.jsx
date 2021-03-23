@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { 
@@ -12,7 +13,7 @@ import {
   Card,
   Button,
 } from 'react-bootstrap'
-import { FiLock, FiHeart, FiSearch } from 'react-icons/fi'
+import { FiLock, FiUnlock, FiHeart, FiSearch } from 'react-icons/fi'
 
 const HeaderWrapper = styled.div`
   width: 100%;
@@ -28,13 +29,19 @@ const AvatarWrapper = styled.div`
   justify-content: flex-end;
 `
 
-
 function MessageHeader({ handleSearchChange }) {
+  const chatRoom = useSelector(state => state.chatRoom.currentChatRoom)
+  const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom)
   return (
     <HeaderWrapper>
-        <Container>
+      <Container>
         <Row>
-          <Col><h3><FiLock />ChatRoomName <FiHeart /></h3></Col>
+          <Col>
+            <h3>
+              {isPrivateChatRoom ? <FiLock /> : <FiUnlock />}
+              {chatRoom && chatRoom.name}<FiHeart />
+            </h3>
+          </Col>
           <Col>
             <InputGroup className="mb-3">
               <InputGroup.Prepend>
