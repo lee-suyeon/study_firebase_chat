@@ -7,7 +7,7 @@ import { FiPackage, FiPlus } from 'react-icons/fi'
 import { connect } from 'react-redux'
 import firebase from '../../../firebase'
 
-import { setCurrentChatRoom } from '../../../redux/actions/chatRoom_action'
+import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action'
 
 const ChatRoomList = styled.ul`
   list-style-type: none;
@@ -120,6 +120,7 @@ class ChatRooms extends Component {
 
   changeChatRoom = (room) => {
     this.props.dispatch(setCurrentChatRoom(room));
+    this.props.dispatch(setPrivateChatRoom(false));
     this.setState({ activeChatRoomId: room.id });
   }
 
