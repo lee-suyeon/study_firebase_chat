@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-import { Modal, Button, Form } from 'react-bootstrap'
+import { Modal, Button, Form, Badge } from 'react-bootstrap'
 import { FiPackage, FiPlus } from 'react-icons/fi'
 
 import { connect } from 'react-redux'
@@ -150,6 +150,12 @@ class ChatRooms extends Component {
                 onClick={() => this.changeChatRoom(room)}
               > 
                 # {room.name}
+                <Badge
+                  style={{ float: 'right', marginTop: '4px'}}
+                  variant="danger"
+                  >
+                    1
+                </Badge>
               </li>
             )})
           }
