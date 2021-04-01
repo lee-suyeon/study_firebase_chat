@@ -52,7 +52,13 @@ class ChatRooms extends Component {
   }
 
   componentWillUnmount() {
-    this.state.chatRoomsRef.off();
+    const { chatRoomsRef, chatRooms, messagesRef } = this.state;
+
+    chatRoomsRef.off();
+
+    chatRooms.forEach(chatRoom => {
+      messagesRef.child(chatRoom.id).off();
+    })
   }
 
   setFirstChatRoom = () => {
@@ -175,6 +181,24 @@ class ChatRooms extends Component {
     this.props.dispatch(setCurrentChatRoom(room));
     this.props.dispatch(setPrivateChatRoom(false));
     this.setState({ activeChatRoomId: room.id });
+
+    this.clearNotifications();
+  }
+
+  clearNotifications = () => {
+    const { notifications } = this.state;
+    const { chatRoom } = this.props;
+
+    let index = notifications.findIndex(
+      notifications => notifications.id === chatRoom.id
+    )
+
+    if(index !== -1) {
+      let updatedNotifications = [ ...notifications ];
+      updatedNotifications[index].lastKnownTotal = notifications[index].total;
+      updatedNotifications[index].count = 0;
+      this.setState({ notifications: updatedNotifications });
+    }
   }
 
   getNotificationCount = (room) => {
@@ -183,8 +207,6 @@ class ChatRooms extends Component {
 
     // 해당 채팅방의 count수를 구한다. 
     let count = 0;
-
-    console.log("notifications", notifications)
 
     notifications.forEach(notification => {
       if(notification.id === room.id){
