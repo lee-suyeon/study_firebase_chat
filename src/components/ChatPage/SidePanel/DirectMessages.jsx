@@ -26,8 +26,10 @@ export class DirectMessages extends Component {
 
   componentDidMount() {
     const { user } = this.props;
-
-    this.addUsersListeners(user.uid)
+    
+    if(user) {
+      this.addUsersListeners(user.uid)
+    }
   }
 
   addUsersListeners = (currentUserId) => {
@@ -84,12 +86,10 @@ export class DirectMessages extends Component {
   
   render() {
     const { users } = this.state;
-
-    console.log("users", users)
     return (
       <div>
         <DirectWrapper>
-          <FiSmile /> DIRECT MESSAGES(1)
+          <FiSmile /> DIRECT MESSAGES({users.length})
         </DirectWrapper>
 
         <DirectList>
