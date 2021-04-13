@@ -22,6 +22,20 @@ export class Favorited extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { user } = this.props;
+
+    if(user) {
+      this.removeListener(user.uid);
+    }
+  }
+
+  removeListener = (userId) => {
+    const { usersRef } = this.state;
+
+    usersRef.child(userId).child("favorited").off();
+  }
+
   changeChatRoom = (room) => {
     this.props.dispatch(setCurrentChatRoom(room));
     this.props.dispatch(setPrivateChatRoom(false));
