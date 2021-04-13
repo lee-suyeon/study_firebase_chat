@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import firebase from '../../../firebase'
@@ -37,6 +37,30 @@ function MessageHeader({ handleSearchChange }) {
 
   const [ isFavorited, setIsFavorited ] = useState(false);
   const usersRef = firebase.database().ref("users");
+
+  useEffect(() => {
+    if(chatRoom && user) {
+      addFavoriteListener(chatRoom.id, user.uid);
+    }
+
+  }, [])
+
+  const addFavoriteListener = (chatRoomId, userId) => {
+    usersRef
+      .child(userId)
+      .child("favorited")
+      .once("value")
+      .then(data => {
+        if(data.val() !== null){
+          // chatRoomIds : 좋아요를 누른 채팅방의 id
+          // data.val() : 좋아요를 누른 채팅방 정보
+          const chatRoomIds = Object.keys(data.val()); 
+          
+          const isAlreadyFavorited = chatRoomIds.includes(chatRoomId)
+          setIsFavorited(isAlreadyFavorited) 
+        }
+      })
+  }
 
   const handleFavorite = () => {
     if(isFavorited) {
