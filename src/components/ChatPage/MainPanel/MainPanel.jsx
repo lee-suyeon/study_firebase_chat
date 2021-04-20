@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { connect } from 'react-redux';
 import firebase from '../../../firebase';
+import { setUserPosts } from '../../../redux/actions/chatRoom_action';
 
 import Message from './Message';
 import MessageHeader from './MessageHeader';
@@ -74,7 +75,23 @@ export class MainPanel extends Component {
         messages: messagesArray,
         messagesLoading: false
       });
+      this.userPostsCount(messagesArray)
     })
+  }
+
+  userPostsCount = (messagesArray) => {
+    let userPosts = messagesArray.reduce(( acc, message ) => {
+      if(message.user.name in acc) {
+        acc[message.user.name].count += 1;
+      } else {
+        acc[message.user.name] = {
+          image: message.user.image,
+          count: 1,
+        }
+      }
+      return acc;
+    }, {})
+    this.props.dispatch(setUserPosts(userPosts));
   }
 
   renderMessages = (messages) => 
