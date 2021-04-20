@@ -13,6 +13,7 @@ import {
   Accordion,
   Card,
   Button,
+  Media,
 } from 'react-bootstrap'
 import { FiLock, FiUnlock, FiHeart, FiSearch } from 'react-icons/fi'
 
@@ -34,6 +35,7 @@ function MessageHeader({ handleSearchChange }) {
   const chatRoom = useSelector(state => state.chatRoom.currentChatRoom)
   const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom)
   const user = useSelector(state => state.user.currentUser);
+  const userPosts = useSelector(state => state.chatRoom.userPosts);
 
   const [ isFavorited, setIsFavorited ] = useState(false);
   const usersRef = firebase.database().ref("users");
@@ -89,6 +91,29 @@ function MessageHeader({ handleSearchChange }) {
       setIsFavorited(prev => !prev);
     }
   }
+
+  const renderUserPosts = (userPosts) => 
+    Object.entries(userPosts)
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([key, value], i) => (
+        <Media key={`user${i}`}>
+          <img 
+            src={value.image}
+            style={{ borderRadius: 25 }}
+            width={48}
+            height={48}
+            className="mr-3"
+            alt={value.name}
+          />
+          <Media.Body>
+            <h6>{key}</h6>
+            <p>
+              {value.count} 개
+            </p>
+          </Media.Body>
+        </Media>
+  ))
+  
 
   return (
     <HeaderWrapper>
@@ -150,11 +175,13 @@ function MessageHeader({ handleSearchChange }) {
               <Card>
                 <Card.Header style={{ padding: '0 1rem' }}>
                   <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                    dd
+                    Posts Count
                   </Accordion.Toggle>
                 </Card.Header>
                 <Accordion.Collapse eventKey="0">
-                  <Card.Body>Hello! I'm the body</Card.Body>
+                  <Card.Body>
+                    {userPosts && renderUserPosts(userPosts)}
+                  </Card.Body>
                 </Accordion.Collapse>
               </Card>
             </Accordion>
