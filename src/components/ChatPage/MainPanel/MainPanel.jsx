@@ -34,6 +34,7 @@ export class MainPanel extends Component {
     searchLoading: true,
     searchResults: [],
     typingUsers: [],
+    listenerLists: [],
   }
 
   componentDidMount() {
@@ -43,6 +44,20 @@ export class MainPanel extends Component {
       this.addMessagesListeners(chatRoom.id);
       this.addTypingListeners(chatRoom.id);
     }
+  }
+
+  componentWillUnmount() {
+    const { chatRoom } = this.props;
+    const { messagesRef, listenerLists } = this.state;
+
+    messagesRef.child(chatRoom.id).off();
+    this.removeListeners(listenerLists);
+  }
+
+  removeListeners = (listeners) => {
+    listeners.forEach(listener => {
+      listener.ref.child(listener.id).off(listener.event)
+    })
   }
 
   addTypingListeners = (chatRoomId) => {
@@ -60,6 +75,9 @@ export class MainPanel extends Component {
       }
     })
 
+    // listenersList state에 등록된 리스너를 넣어주기
+    this.addToListenerLists(chatRoomId, typingRef, "child_added")
+
     // 타이핑을 지워줄 때
     typingRef.child(chatRoomId).on("child_removed", DataSnapshot => {
       const index = typingUsers.findIndex(user => user.id === DataSnapshot.key);
@@ -68,6 +86,30 @@ export class MainPanel extends Component {
         this.setState({ typingUsers });
       }
     })
+
+    // listenersList state에 등록된 리스너를 넣어주기
+    this.addToListenerLists(chatRoomId, typingRef, "child_removed")
+  }
+
+  addToListenerLists = (id, ref, event) => {
+    const { listenerLists } = this.state;
+    
+    // 이미 등록된 리스너인지 확인
+    const index = listenerLists.findIndex(listener => {
+      return (
+        listener.id === id &&
+        listener.ref === ref &&
+        listener.event === event
+      )
+    })
+
+    // 새로운 이벤트 등록
+    if(index === -1){
+      const newListener = { id, ref, event }
+      this.setState({
+        listenerLists: listenerLists.concat(newListener)
+      })
+    }
   }
 
   handleSearchMessages = () => {
@@ -75,7 +117,7 @@ export class MainPanel extends Component {
     const regex = new RegExp(this.state.searchTerm, "gi");
     const searchResults = chatRoomMessages.reduce((acc, message) => {
       if(
-        message.content && message.content.match(regex) ||
+        (message.content && message.content.match(regex)) ||
         (message.user.name.match(regex))
       ){
         acc.push(message)

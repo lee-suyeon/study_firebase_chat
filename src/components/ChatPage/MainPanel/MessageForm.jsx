@@ -71,10 +71,9 @@ function MessageForm() {
 
     // firebase에 메세지 저장
     try {
-      await messagesRef
-        .child(chatRoom.id)
-        .push()
-        .set(createMessage())
+      await messagesRef.child(chatRoom.id).push().set(createMessage())
+
+        typingRef.child(chatRoom.id).child(user.uid).remove();
 
         setLoading(false);
         setContent("");
