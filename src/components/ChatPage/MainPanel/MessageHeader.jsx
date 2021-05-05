@@ -57,7 +57,6 @@ function MessageHeader({ handleSearchChange }) {
           // chatRoomIds : 좋아요를 누른 채팅방의 id
           // data.val() : 좋아요를 누른 채팅방 정보
           const chatRoomIds = Object.keys(data.val()); 
-          
           const isAlreadyFavorited = chatRoomIds.includes(chatRoomId)
           setIsFavorited(isAlreadyFavorited) 
         }
@@ -113,7 +112,6 @@ function MessageHeader({ handleSearchChange }) {
           </Media.Body>
         </Media>
   ))
-  
 
   return (
     <HeaderWrapper>
@@ -144,6 +142,7 @@ function MessageHeader({ handleSearchChange }) {
             </InputGroup>
           </Col>
         </Row>
+        {!isPrivateChatRoom &&
           <AvatarWrapper>
             <p>
               <Image 
@@ -155,6 +154,7 @@ function MessageHeader({ handleSearchChange }) {
               {chatRoom && chatRoom.createdBy.name}
             </p>
           </AvatarWrapper>
+        }
         <Row>
           <Col>
             <Accordion>
