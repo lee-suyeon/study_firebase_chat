@@ -131,10 +131,15 @@ export class MainPanel extends Component {
           user={this.props.user}
         />
   ))
-  
 
+  renderTypingUsers = (typingUsers) => 
+    typingUsers.length > 0 &&
+    typingUsers.map(user => (
+      <span key={user.name}>{user.name}님이 입력중...</span>
+    ))
+  
   render () {
-    const { messages, searchTerm, searchResults } = this.state;
+    const { messages, searchTerm, searchResults, typingUsers } = this.state;
     return (
       <MainWrapper>
         <MessageHeader 
@@ -145,6 +150,7 @@ export class MainPanel extends Component {
             this.renderMessages(searchResults) :
             this.renderMessages(messages)
           }
+          {this.renderTypingUsers(typingUsers)}
         </MessageWrapper>
           <MessageForm />
       </MainWrapper>
