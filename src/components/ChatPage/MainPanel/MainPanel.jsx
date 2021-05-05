@@ -28,18 +28,46 @@ export class MainPanel extends Component {
   state = {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
+    typingRef: firebase.database().ref("typing"),
     messagesLoading: true,
     searchTerm: "",
     searchLoading: true,
     searchResults: [],
+    typingUsers: [],
   }
 
   componentDidMount() {
     const { chatRoom } = this.props;
     
     if(chatRoom) {
-      this.addMessagesListeners(chatRoom.id)
+      this.addMessagesListeners(chatRoom.id);
+      this.addTypingListeners(chatRoom.id);
     }
+  }
+
+  addTypingListeners = (chatRoomId) => {
+    const { typingRef } = this.state;
+
+    let typingUsers = [];
+    // 타이핑이 새로 들어올 때
+    typingRef.child(chatRoomId).on("child_added", DataSnapshot => {
+      if(DataSnapshot.key !== this.props.user.uid) {
+        typingUsers = typingUsers.concat({
+          id: DataSnapshot.key,
+          name: DataSnapshot.val()
+        });
+        this.setState({ typingUsers })
+      }
+    })
+
+    // 타이핑을 지워줄 때
+    typingRef.child(chatRoomId).on("child_removed", DataSnapshot => {
+      const index = typingUsers.findIndex(user => user.id === DataSnapshot.key);
+      if(index !== -1){
+        typingUsers = typingUsers.filter(user => user.id !== DataSnapshot.key);
+        this.setState({ typingUsers });
+      }
+    })
   }
 
   handleSearchMessages = () => {
