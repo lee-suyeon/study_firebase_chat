@@ -9,6 +9,8 @@ import Message from './Message';
 import MessageHeader from './MessageHeader';
 import MessageForm from './MessageForm';
 
+import Skeleton from '../../../commons/components/Skeleton'
+
 const MainWrapper = styled.div`
   padding: 2rem 2rem 0 2rem;
 `
@@ -190,15 +192,27 @@ export class MainPanel extends Component {
     typingUsers.map(user => (
       <span key={user.name}>{user.name}님이 입력중...</span>
     ))
+
+  renderMessageSkeleton = (loading) => 
+    loading && (
+      <>
+        {[...Array(10)].map((v, i) => (
+          <Skeleton key={i}/>
+        ))}
+      </>
+    )  
   
   render () {
-    const { messages, searchTerm, searchResults, typingUsers } = this.state;
+    const { messages, searchTerm, searchResults, typingUsers, messagesLoading } = this.state;
     return (
       <MainWrapper>
         <MessageHeader 
           handleSearchChange={this.handleSearchChange}
         />
         <MessageWrapper>
+
+          {this.renderMessageSkeleton(messagesLoading)}
+
           {searchTerm ?
             this.renderMessages(searchResults) :
             this.renderMessages(messages)
