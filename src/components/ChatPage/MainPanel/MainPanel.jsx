@@ -25,6 +25,8 @@ const MessageWrapper = styled.div`
 
 export class MainPanel extends Component {
 
+  messageEndRef = React.createRef();
+
   state = {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
@@ -46,11 +48,19 @@ export class MainPanel extends Component {
     }
   }
 
+  componentDidUpdate() {
+    if(this.messageEndRef) {
+      this.messageEndRef.scrollIntoView({
+        behavior: "smooth"
+      })
+    }
+  }
+
   componentWillUnmount() {
     const { chatRoom } = this.props;
     const { messagesRef, listenerLists } = this.state;
 
-    messagesRef.child(chatRoom.id).off();
+    messagesRef.off();
     this.removeListeners(listenerLists);
   }
 
@@ -159,6 +169,7 @@ export class MainPanel extends Component {
           count: 1,
         }
       }
+      console.log('acc', acc)
       return acc;
     }, {})
     this.props.dispatch(setUserPosts(userPosts));
@@ -193,6 +204,7 @@ export class MainPanel extends Component {
             this.renderMessages(messages)
           }
           {this.renderTypingUsers(typingUsers)}
+          <div ref={node => (this.messageEndRef = node)}/>
         </MessageWrapper>
           <MessageForm />
       </MainWrapper>
